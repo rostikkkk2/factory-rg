@@ -12,23 +12,26 @@ class Factory
       Class.new do
         attr_accessor(*args)
 
-        define_method :initialize do |*values|
-          raise ArgumentError.new unless args.count == values.count
-          args.zip(values).each {|l, n| instance_variable_set("@#{l}", n)}
+        define_method :initialize do |*vals|
+          raise ArgumentError.new unless args.count == vals.count
+          args.zip(vals).each {|key, val| instance_variable_set("@#{key}", val)}
+        end
+
+        class_eval(&block) if block_given?
+
+        def ==(obj)
+          self.class == obj.class && self.map_instance == obj.map_instance
+        end
+
+        def [](val)
+          (val.is_a? Integer) ? map_instance[val] : instance_variable_get("@#{val}")
+        end
+        
+        def map_instance
+          instance_variables.map {|var| instance_variable_get(var)}
         end
 
       end
     end
   end
 end
-
-# * Instance of creatable Factory class should correctly respond to main methods of Struct
-# - each
-# - each_pair
-# - dig
-# - size/length
-# - members
-# - select
-# - to_a
-# - values_at
-# - ==, eql?
