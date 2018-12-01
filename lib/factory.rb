@@ -65,9 +65,7 @@ class Factory
         end
 
         def to_h
-          result = {}
-          instance_variables.map { |n| result[n[1..-1]] = instance_variable_get(n) }
-          result
+          instance_variables.map { |var| [var.to_s.delete('@'), instance_variable_get(var)] }.to_h
         end
 
         def map_instance
